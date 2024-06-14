@@ -15,7 +15,9 @@ if(WIN32)
   set(CMAKE_GENERATOR_CC cl)
 endif()
 
+if(NOT HUNTER_ENABLED)
 include(cmake/go.cmake)
+endif()
 include(cmake/paths.cmake)
 include(gen/sources.cmake)
 
@@ -460,6 +462,7 @@ if(USE_CUSTOM_LIBCXX)
   target_link_libraries(libcxx libcxxabi)
 endif()
 
+if(NOT HUNTER_ENABLED)
 # Add minimal googletest targets. The provided one has many side-effects, and
 # googletest has a very straightforward build.
 add_library(
@@ -487,6 +490,7 @@ add_custom_target(all_tests)
 add_subdirectory(ssl/test)
 add_subdirectory(util/fipstools)
 add_subdirectory(util/fipstools/acvp/modulewrapper)
+endif(NOT HUNTER_ENABLED)
 
 if(OPENSSL_ASM)
   set(CRYPTO_SOURCES_ASM_USED ${CRYPTO_SOURCES_ASM})
@@ -619,6 +623,7 @@ add_library(ssl ${SSL_SOURCES})
 set_property(TARGET ssl PROPERTY EXPORT_NAME SSL)
 target_link_libraries(ssl crypto)
 
+if(NOT HUNTER_ENABLED)
 add_library(decrepit ${DECREPIT_SOURCES})
 target_link_libraries(decrepit crypto ssl)
 
@@ -682,6 +687,7 @@ copy_post_build(crypto crypto crypto_test urandom_test)
 copy_post_build(ssl ssl ssl_test)
 copy_post_build(decrepit decrepit decrepit_test)
 copy_post_build(tool bssl)
+endif(NOT HUNTER_ENABLED)
 
 if(FUZZ)
   if(LIBFUZZER_FROM_DEPS)
@@ -773,7 +779,9 @@ if(INSTALL_ENABLED)
 
   install(TARGETS crypto ssl
           EXPORT OpenSSLTargets ${INSTALL_DESTINATION_DEFAULT})
+  if(NOT HUNTER_ENABLED)
   install(TARGETS bssl DESTINATION ${INSTALL_DESTINATION_DEFAULT})
+  endif(NOT HUNTER_ENABLED)
   install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
   install(EXPORT OpenSSLTargets
           FILE OpenSSLTargets.cmake
